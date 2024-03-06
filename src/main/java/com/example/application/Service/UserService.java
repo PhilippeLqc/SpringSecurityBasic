@@ -5,6 +5,9 @@ import com.example.application.Class.User;
 import com.example.application.Repository.UserRepository;
 import com.example.application.RoleType;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +15,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private UserRepository userRepository;
     private BCryptPasswordEncoder passwordEncoder;
@@ -31,10 +34,15 @@ public class UserService {
         user.setPassword(BcryptPassword);
 
         Role roleUser = new Role();
-        roleUser.setLabel(RoleType.USER);
+        roleUser.setLabel(RoleType.User);
         user.setRole(roleUser);
 
         this.userRepository.save(user);
 
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return this.userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("Email not found"));
     }
 }

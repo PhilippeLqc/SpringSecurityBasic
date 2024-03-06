@@ -23,11 +23,8 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "password")
     private String password;
-    @Column(name = "name")
     private String name;
-    @Column(name = "email")
     private String email;
     @Column(name = "enabled")
     private boolean isEnabled = false;
