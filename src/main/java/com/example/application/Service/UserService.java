@@ -5,7 +5,6 @@ import com.example.application.Class.User;
 import com.example.application.Repository.UserRepository;
 import com.example.application.RoleType;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -42,7 +41,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public User loadUserByUsername(String username) throws UsernameNotFoundException {
         return this.userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("Email not found"));
     }
 }

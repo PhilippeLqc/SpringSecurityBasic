@@ -1,10 +1,11 @@
 package com.example.application.Controller;
 
+import com.example.application.Security.JwtService;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import com.example.application.Class.User;
 import com.example.application.DTO.AuthenficationDto;
 import com.example.application.Service.UserService;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +26,7 @@ public class UserController {
 
     private UserService userService;
     private AuthenticationManager authenticationManager;
+    private JwtService jwtService;
 
     @PostMapping("/signin")
     public void signin(@RequestBody User user) {
@@ -32,12 +34,23 @@ public class UserController {
         this.userService.signin(user);
     }
 
+    //@PostMapping("/login")
+    //public Map<String, String> login(@RequestBody AuthenficationDto authenficationDto) {
+    //  System.out.println("User logged in");
+    //UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(authenficationDto.username(), authenficationDto.password());
+    //Authentication authentication = this.authenticationManager.authenticate(token);
+    //System.out.println("Authentication: " + authentication);
+    //return Map.of("token", "Bearer " + authentication.getCredentials());
+    //}
+
     @PostMapping("/login")
     public Map<String, String> login(@RequestBody AuthenficationDto authenficationDto) {
         System.out.println("User logged in");
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(authenficationDto.username(), authenficationDto.password());
         Authentication authentication = this.authenticationManager.authenticate(token);
-        System.out.println("Authentication: " + authentication);
+        if (authentication.isAuthenticated()) {
+            return this.jwtService.generate(authenficationDto.username());
+        }
         return Map.of("token", "Bearer " + authentication.getCredentials());
     }
 }
