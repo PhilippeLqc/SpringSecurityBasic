@@ -18,10 +18,10 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String message;
-    private String author;
+    @ManyToOne
+    private User user;
     // TODO: Add a field to store the date of the message
     // TODO: Add a field to store the time of the message
-    // TODO: Add a field to store the author of the message
     // TODO: Add a field to store the recipient of the message
 
 }

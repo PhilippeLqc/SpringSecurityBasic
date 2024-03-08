@@ -34,15 +34,6 @@ public class UserController {
         this.userService.signin(user);
     }
 
-    //@PostMapping("/login")
-    //public Map<String, String> login(@RequestBody AuthenficationDto authenficationDto) {
-    //  System.out.println("User logged in");
-    //UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(authenficationDto.username(), authenficationDto.password());
-    //Authentication authentication = this.authenticationManager.authenticate(token);
-    //System.out.println("Authentication: " + authentication);
-    //return Map.of("token", "Bearer " + authentication.getCredentials());
-    //}
-
     @PostMapping("/login")
     public Map<String, String> login(@RequestBody AuthenficationDto authenficationDto) {
         System.out.println("User logged in");
@@ -51,7 +42,7 @@ public class UserController {
         if (authentication.isAuthenticated()) {
             return this.jwtService.generate(authenficationDto.username());
         }
-        return Map.of("token", "Bearer " + authentication.getCredentials());
+        return Map.of("token", "bearer" + token);
     }
 }
 

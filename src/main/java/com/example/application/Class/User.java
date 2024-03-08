@@ -27,7 +27,7 @@ public class User implements UserDetails {
     private String name;
     private String email;
     @Column(name = "enabled")
-    private boolean isEnabled = false;
+    private boolean isEnabled = true;
     @OneToOne(cascade = CascadeType.ALL)
     private Role role;
 
