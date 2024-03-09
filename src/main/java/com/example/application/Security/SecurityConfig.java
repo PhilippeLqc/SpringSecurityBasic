@@ -3,6 +3,7 @@ package com.example.application.Security;
 import com.example.application.Service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,8 +14,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import static org.springframework.http.HttpMethod.POST;
 
 @Configuration
 @EnableWebSecurity
@@ -27,7 +26,8 @@ public class SecurityConfig {
     public SecurityConfig(JwtFilter jwtFilter, UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.jwtFilter = jwtFilter;
         this.userService = userService;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        ;
     }
 
     @Bean
@@ -35,13 +35,12 @@ public class SecurityConfig {
         return
                 http
                         .csrf(AbstractHttpConfigurer::disable)
-                        .authorizeRequests(
-                                authorize ->
-                                        authorize
-                                                .requestMatchers(POST, "/signin").permitAll()
-                                                .requestMatchers(POST, "/login").permitAll()
-                                                .requestMatchers("/error").permitAll()
-                                                .anyRequest().authenticated()
+                        .authorizeHttpRequests((authz) -> authz
+                                .requestMatchers("/signin").permitAll()
+                                .requestMatchers("/login").permitAll()
+                                .requestMatchers("/logout").permitAll()
+                                .requestMatchers("/error").permitAll()
+                                .anyRequest().authenticated()
                         )
                         .sessionManagement(httpSecuritySessionManagementConfigurer ->
                                 httpSecuritySessionManagementConfigurer
@@ -49,6 +48,11 @@ public class SecurityConfig {
 
                         )
                         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                        .logout(logout -> logout
+                                .logoutUrl("/logout")
+                                .invalidateHttpSession(true)
+                                .deleteCookies("JSESSIONID")
+                        )
                         .build();
     }
 
