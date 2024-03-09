@@ -38,7 +38,6 @@ public class SecurityConfig {
                         .authorizeHttpRequests((authz) -> authz
                                 .requestMatchers("/signin").permitAll()
                                 .requestMatchers("/login").permitAll()
-                                .requestMatchers("/logout").permitAll()
                                 .requestMatchers("/error").permitAll()
                                 .anyRequest().authenticated()
                         )
@@ -48,11 +47,6 @@ public class SecurityConfig {
 
                         )
                         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                        .logout(logout -> logout
-                                .logoutUrl("/logout")
-                                .invalidateHttpSession(true)
-                                .deleteCookies("JSESSIONID")
-                        )
                         .build();
     }
 
