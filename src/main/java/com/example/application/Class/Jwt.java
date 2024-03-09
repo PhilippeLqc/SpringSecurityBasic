@@ -2,7 +2,7 @@ package com.example.application.Class;
 
 import jakarta.persistence.*;
 import lombok.*;
-
+@Entity
 @Getter
 @Builder
 @NoArgsConstructor
@@ -13,7 +13,7 @@ public class Jwt {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String Value;
+    private String value;
     private boolean isDeactivated;
     private boolean isExpired;
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE})

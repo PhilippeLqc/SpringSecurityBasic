@@ -44,8 +44,5 @@ public class UserController {
         }
         return Map.of("token", "bearer" + token);
     }
-
-    @PostMapping("/logout")
-    public
 }
 

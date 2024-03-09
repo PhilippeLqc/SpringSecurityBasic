@@ -24,11 +24,15 @@ public class JwtService {
     private UserService userService;
     private JwtRepository jwtRepository;
 
+    public Jwt tokenByValue(String value) {
+        return this.jwtRepository.findByValue(value)
+                .orElseThrow(() -> new RuntimeException("Token not found"));
+    }
     public Map<String, String> generate(String username) {
         User user = this.userService.loadUserByUsername(username);
         final Map<String, String> jwtMap = this.generateJwt(user);
         final Jwt jwt = Jwt.builder()
-                .Value(jwtMap.get(BEARER))
+                .value(jwtMap.get(BEARER))
                 .isDeactivated(false)
                 .isExpired(false)
                 .user(user)
@@ -83,4 +87,5 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload();
     }
+
 }
