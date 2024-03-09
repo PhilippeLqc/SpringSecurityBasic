@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Objects;
+
 
 @Service
 public class JwtFilter extends OncePerRequestFilter {
@@ -33,6 +33,7 @@ public class JwtFilter extends OncePerRequestFilter {
         boolean isTokenExpired = true;
         Jwt jwtInDb = null;
 
+        // Get the token from the header and check if it is valid and not expired
         final String authorization = request.getHeader("Authorization");
         if (authorization != null && authorization.startsWith("Bearer ")) {
             token = authorization.substring(7);
@@ -45,7 +46,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 && SecurityContextHolder.getContext().getAuthentication() == null
         ) {
             UserDetails userDetails = userService.loadUserByUsername(username);
-
             UsernamePasswordAuthenticationToken AuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             AuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(AuthenticationToken);

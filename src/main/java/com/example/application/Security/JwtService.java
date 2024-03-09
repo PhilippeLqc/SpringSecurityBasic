@@ -8,14 +8,19 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
+@Transactional
 @Service
 @AllArgsConstructor
 public class JwtService {
@@ -25,20 +30,35 @@ public class JwtService {
     private JwtRepository jwtRepository;
 
     public Jwt tokenByValue(String value) {
-        return this.jwtRepository.findByValue(value)
+        return this.jwtRepository.findByValueAndDeactivatedAndExpired(
+                        value,
+                        false,
+                        false)
                 .orElseThrow(() -> new RuntimeException("Token not found"));
     }
+
     public Map<String, String> generate(String username) {
         User user = this.userService.loadUserByUsername(username);
         final Map<String, String> jwtMap = this.generateJwt(user);
+        this.deactivateToken(user);
         final Jwt jwt = Jwt.builder()
                 .value(jwtMap.get(BEARER))
-                .isDeactivated(false)
-                .isExpired(false)
+                .deactivated(false)
+                .expired(false)
                 .user(user)
                 .build();
         this.jwtRepository.save(jwt);
         return jwtMap;
+    }
+
+    private void deactivateToken(User user) {
+        final List<Jwt> jwtList = this.jwtRepository.findAllByEmail(user.getEmail()).peek(
+                jwt -> {
+                    jwt.setDeactivated(true);
+                    jwt.setExpired(true);
+                }
+        ).collect(Collectors.toList());
+        this.jwtRepository.saveAll(jwtList);
     }
 
     public String readUsername(String token) {
@@ -88,4 +108,16 @@ public class JwtService {
                 .getPayload();
     }
 
+    // Logout the user by deactivating the token in the database
+    public void logout() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Jwt jwt = this.jwtRepository.findByEmailAndDeactivatedAndExpired(
+                user.getEmail(),
+                false,
+                false
+        ).orElseThrow(() -> new RuntimeException("Token invalid"));
+        jwt.setDeactivated(true);
+        jwt.setExpired(true);
+        this.jwtRepository.save(jwt);
+    }
 }
