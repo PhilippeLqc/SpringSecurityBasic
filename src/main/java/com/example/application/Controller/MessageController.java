@@ -17,8 +17,6 @@ public class MessageController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public void create(@RequestBody Message message) {
-        // Save the author of the message
-
         this.messageService.create(message);
     }
 }

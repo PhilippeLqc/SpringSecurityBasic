@@ -1,5 +1,6 @@
 package com.example.application.Security;
 
+import com.example.application.Class.Jwt;
 import com.example.application.Service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @Service
 public class JwtFilter extends OncePerRequestFilter {
@@ -29,14 +31,19 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = null;
         String username = null;
         boolean isTokenExpired = true;
+        Jwt jwtInDb = null;
 
         final String authorization = request.getHeader("Authorization");
         if (authorization != null && authorization.startsWith("Bearer ")) {
             token = authorization.substring(7);
+            jwtInDb = this.jwtService.tokenByValue(token);
             isTokenExpired = jwtService.isTokenExpired(token);
             username = jwtService.readUsername(token);
         }
-        if (!isTokenExpired && username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (!isTokenExpired
+                && jwtInDb.getUser().getEmail().equals(username)
+                && SecurityContextHolder.getContext().getAuthentication() == null
+        ) {
             UserDetails userDetails = userService.loadUserByUsername(username);
 
             UsernamePasswordAuthenticationToken AuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

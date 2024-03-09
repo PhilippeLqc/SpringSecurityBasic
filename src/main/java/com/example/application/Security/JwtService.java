@@ -1,6 +1,8 @@
 package com.example.application.Security;
 
+import com.example.application.Class.Jwt;
 import com.example.application.Class.User;
+import com.example.application.Repository.JwtRepository;
 import com.example.application.Service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -18,11 +20,25 @@ import java.util.function.Function;
 @AllArgsConstructor
 public class JwtService {
 
+    public static final String BEARER = "Bearer";
     private UserService userService;
+    private JwtRepository jwtRepository;
 
+    public Jwt tokenByValue(String value) {
+        return this.jwtRepository.findByValue(value)
+                .orElseThrow(() -> new RuntimeException("Token not found"));
+    }
     public Map<String, String> generate(String username) {
         User user = this.userService.loadUserByUsername(username);
-        return this.generateJwt(user);
+        final Map<String, String> jwtMap = this.generateJwt(user);
+        final Jwt jwt = Jwt.builder()
+                .value(jwtMap.get(BEARER))
+                .isDeactivated(false)
+                .isExpired(false)
+                .user(user)
+                .build();
+        this.jwtRepository.save(jwt);
+        return jwtMap;
     }
 
     public String readUsername(String token) {
@@ -50,7 +66,7 @@ public class JwtService {
                 .subject(user.getEmail())
                 .claims(claims)
                 .signWith(this.getKeys()).compact();
-        return Map.of("Bearer", bearer);
+        return Map.of(BEARER, bearer);
     }
 
     private SecretKey getKeys() {
@@ -71,4 +87,5 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload();
     }
+
 }
