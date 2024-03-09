@@ -46,10 +46,9 @@ public class UserController {
         return Map.of("token", "bearer" + token);
     }
 
-    @PostMapping("/logout")
-    public void logout() {
-        System.out.println("User logged out");
-        this.jwtService.logout();
+    @PostMapping("/deconnexion")
+    public void deconnexion() {
+        this.jwtService.deconnexion();
     }
 }
 

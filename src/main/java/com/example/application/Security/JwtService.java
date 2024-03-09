@@ -10,16 +10,19 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
+@Slf4j
 @Transactional
 @Service
 @AllArgsConstructor
@@ -109,15 +112,20 @@ public class JwtService {
     }
 
     // Logout the user by deactivating the token in the database
-    public void logout() {
+    public void deconnexion() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Jwt jwt = this.jwtRepository.findByEmailAndDeactivatedAndExpired(
                 user.getEmail(),
                 false,
                 false
-        ).orElseThrow(() -> new RuntimeException("Token invalid"));
+        ).orElseThrow(() -> new RuntimeException("Token not found"));
         jwt.setDeactivated(true);
         jwt.setExpired(true);
         this.jwtRepository.save(jwt);
+    }
+    @Scheduled(cron = "@daily")
+    public void removeToken(){
+        log.info("Removing expired tokens : ", Instant.now());
+        this.jwtRepository.deleteAllByExpiredAndDeactivated(true, true);
     }
 }
