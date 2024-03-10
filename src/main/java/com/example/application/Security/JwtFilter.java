@@ -41,9 +41,9 @@ public class JwtFilter extends OncePerRequestFilter {
             isTokenExpired = jwtService.isTokenExpired(token);
             username = jwtService.readUsername(token);
         }
-        if (!isTokenExpired
-                && jwtInDb.getUser().getEmail().equals(username)
-                && SecurityContextHolder.getContext().getAuthentication() == null
+        if (!isTokenExpired // Check if the token is not expired
+                && jwtInDb.getUser().getEmail().equals(username) // Check if the token is associated with the user
+                && SecurityContextHolder.getContext().getAuthentication() == null // Check if the user is not already authenticated
         ) {
             UserDetails userDetails = userService.loadUserByUsername(username);
             UsernamePasswordAuthenticationToken AuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -53,4 +53,3 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
-
