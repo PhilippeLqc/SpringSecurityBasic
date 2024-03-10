@@ -21,12 +21,14 @@ public class JwtFilter extends OncePerRequestFilter {
     private UserService userService;
     private JwtService jwtService;
 
+    // Constructor to inject the UserService and JwtService
     public JwtFilter(UserService userService, JwtService jwtService) {
         this.userService = userService;
         this.jwtService = jwtService;
     }
 
     @Override
+    // Method to check if the token is valid and not expired
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = null;
         String username = null;
@@ -34,8 +36,10 @@ public class JwtFilter extends OncePerRequestFilter {
         Jwt jwtInDb = null;
 
         // Get the token from the header and check if it is valid and not expired
-        final String authorization = request.getHeader("Authorization");
-        if (authorization != null && authorization.startsWith("Bearer ")) {
+        final String authorization = request.getHeader("Authorization"); // Get the token from the header
+        if (authorization != null
+                && authorization.startsWith("Bearer ")
+        ) {
             token = authorization.substring(7);
             jwtInDb = this.jwtService.tokenByValue(token);
             isTokenExpired = jwtService.isTokenExpired(token);
@@ -50,6 +54,7 @@ public class JwtFilter extends OncePerRequestFilter {
             AuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(AuthenticationToken);
         }
+        // Continue the filter chain after the token is validated
         filterChain.doFilter(request, response);
     }
 }

@@ -22,6 +22,8 @@ public class Message {
     private User user;
     // TODO: Add a field to store the date of the message
     // TODO: Add a field to store the time of the message
-    // TODO: Add a field to store the recipient of the message
+    // TODO: Add a field to store the status of the message (read, unread, etc.)
+    // TODO: Add a field to store the type of the message (text, image, etc.)
+    // TODO: Add a field to store the message's receiver
 
 }

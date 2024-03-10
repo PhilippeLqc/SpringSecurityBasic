@@ -3,7 +3,6 @@ package com.example.application.Security;
 import com.example.application.Service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,12 +22,14 @@ public class SecurityConfig {
     private final UserService userService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    // Constructor to inject the JwtFilter, UserService, and BCryptPasswordEncoder
     public SecurityConfig(JwtFilter jwtFilter, UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.jwtFilter = jwtFilter;
         this.userService = userService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
+    // Method to configure the security filter chain
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return
@@ -50,6 +51,7 @@ public class SecurityConfig {
                         .build();
     }
 
+    // Method to configure the authentication provider
     @Bean
     public AuthenticationProvider authenticationProvider(UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -58,6 +60,7 @@ public class SecurityConfig {
         return provider;
     }
 
+    // Method to configure the authentication manager
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationProvider authenticationProvider) {
         return authenticationProvider::authenticate;

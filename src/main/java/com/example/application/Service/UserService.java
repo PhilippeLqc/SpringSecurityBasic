@@ -40,8 +40,10 @@ public class UserService implements UserDetailsService {
 
     }
 
+    // Method to load the user by email
     @Override
     public User loadUserByUsername(String username) throws UsernameNotFoundException {
-        return this.userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("Email not found"));
+        return this.userRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Email not found"));
     }
 }
