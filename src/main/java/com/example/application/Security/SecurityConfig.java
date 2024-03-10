@@ -27,7 +27,6 @@ public class SecurityConfig {
         this.jwtFilter = jwtFilter;
         this.userService = userService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        ;
     }
 
     @Bean
@@ -39,6 +38,7 @@ public class SecurityConfig {
                                 .requestMatchers("/signin").permitAll()
                                 .requestMatchers("/login").permitAll()
                                 .requestMatchers("/error").permitAll()
+                                .requestMatchers("/refreshToken").permitAll()
                                 .anyRequest().authenticated()
                         )
                         .sessionManagement(httpSecuritySessionManagementConfigurer ->
